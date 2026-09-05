@@ -182,8 +182,10 @@
         caregiver: sp.get('caregiver') || '',
       };
 
-      // 10 个并行请求
-      const tasks = slots.map((_, i) => (async () => {
+      // 10 个分批并行（每批 3 个，避免 LLM 端并发限流）
+      const BATCH = 3;
+      const indices = Array.from({ length: 10 }, (_, i) => i);
+      async function runOne(i) {
         slotStatus[i] = 'loading';
         renderProgress();
         try {
@@ -203,9 +205,11 @@
           slotErrors[i] = e.message;
         }
         renderProgress();
-      })());
-
-      await Promise.all(tasks);
+      }
+      for (let s = 0; s < indices.length; s += BATCH) {
+        const slice = indices.slice(s, s + BATCH);
+        await Promise.all(slice.map(runOne));
+      }
 
       // 收尾：清掉进度条
       const finalHtml = slots.map((c, i) => {
