@@ -336,7 +336,7 @@
         <td>${escapeHtml(it.caregiver_name)}</td>
         ${sc(it.professionalism)}${sc(it.attitude)}${sc(it.efficiency)}${sc(it.emotion)}
         <td class="score-cell ${scoreClass(it.total_score)}"><b>${fmt(it.total_score)}</b></td>
-        <td><a class="act-btn" href="/admin/submission.html?id=${it.id}">查看</a></td>
+        <td><a class="act-btn" href="/admin/submission?id=${it.id}">查看</a></td>
       </tr>`;
     }).join('');
     $('#moreHint').hidden = items.length < 50;
