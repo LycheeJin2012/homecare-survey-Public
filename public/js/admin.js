@@ -136,34 +136,88 @@
     btn.disabled = true;
     btn.textContent = '🤖 生成中…';
     modal.classList.remove('hidden');
-    body.innerHTML = '<p class="dim">报告生成中…通常 30-60 秒。</p>';
     copyBtn.disabled = true;
     _lastReport = '';
 
+    // 准备 10 个空槽位
+    const slots = new Array(10).fill(null);
+    const slotStatus = new Array(10).fill('pending'); // pending | loading | done | error
+    const slotErrors = new Array(10).fill('');
+    function renderProgress() {
+      const done = slotStatus.filter((s) => s === 'done').length;
+      const errs = slotStatus.filter((s) => s === 'error').length;
+      const header = `<div class="report-progress">
+        <div class="dim small">分段生成进度：${done}/10 完成${errs ? ` · ${errs} 个失败` : ''}</div>
+        <div class="report-progress-bar"><div class="report-progress-fill" style="width:${(done / 10) * 100}%"></div></div>
+      </div>`;
+      const sections = slots.map((content, i) => {
+        const status = slotStatus[i];
+        let cls = 'report-slot';
+        let inner;
+        if (status === 'pending') {
+          inner = `<div class="report-slot-pending">⏳ 第 ${i + 1} 段：等待生成…</div>`;
+        } else if (status === 'loading') {
+          inner = `<div class="report-slot-pending">⏳ 第 ${i + 1} 段：正在生成…</div>`;
+        } else if (status === 'error') {
+          inner = `<div class="report-slot-error">❌ 第 ${i + 1} 段失败：${escapeHtml(slotErrors[i])}</div>`;
+        } else if (content) {
+          const html = window.marked ? marked.parse(content) : escapeHtml(content);
+          inner = `<div class="report-slot-content">${html}</div>`;
+        } else {
+          inner = '';
+        }
+        return `<div class="${cls}" data-slot="${i}">${inner}</div>`;
+      }).join('');
+      body.innerHTML = header + sections;
+    }
+    renderProgress();
+    body.scrollTop = 0;
+
     try {
       const qs = buildFilterQS();
-      // 把 ?a=1&b=2 改成 body：把参数读出来
       const sp = new URLSearchParams(qs.startsWith('?') ? qs.slice(1) : '');
-      const body2 = {
+      const filterBody = {
         start: sp.get('start') || '',
         end: sp.get('end') || '',
         caregiver: sp.get('caregiver') || '',
       };
-      const r = await fetch('/api/admin/report', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify(body2),
-      });
-      const data = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(data.error || `请求失败（${r.status}）`);
-      _lastReport = data.report || '';
-      // 用 marked 渲染
-      if (window.marked) {
-        body.innerHTML = '<div class="report-content">' + marked.parse(_lastReport) + '</div>';
-      } else {
-        body.textContent = _lastReport;
-      }
+
+      // 10 个并行请求
+      const tasks = slots.map((_, i) => (async () => {
+        slotStatus[i] = 'loading';
+        renderProgress();
+        try {
+          const r = await fetch('/api/admin/report', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ ...filterBody, section_index: i }),
+          });
+          const data = await r.json().catch(() => ({}));
+          if (!r.ok) throw new Error(data.error || `请求失败（${r.status}）`);
+          slots[i] = data.report || '';
+          slotStatus[i] = 'done';
+          _lastReport = slots.map((c, j) => c || '').join('\n\n');
+        } catch (e) {
+          slotStatus[i] = 'error';
+          slotErrors[i] = e.message;
+        }
+        renderProgress();
+      })());
+
+      await Promise.all(tasks);
+
+      // 收尾：清掉进度条
+      const finalHtml = slots.map((c, i) => {
+        if (slotStatus[i] === 'done' && c) {
+          const html = window.marked ? marked.parse(c) : escapeHtml(c);
+          return `<div class="report-slot">${html}</div>`;
+        } else if (slotStatus[i] === 'error') {
+          return `<div class="report-slot-error">❌ 第 ${i + 1} 段失败：${escapeHtml(slotErrors[i])}</div>`;
+        }
+        return '';
+      }).join('');
+      body.innerHTML = `<div class="report-content">${finalHtml}</div>`;
       body.scrollTop = 0;
       copyBtn.disabled = false;
     } catch (e) {
