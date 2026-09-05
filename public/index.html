@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>居家护理服务满意度调研</title>
+  <link rel="stylesheet" href="/css/survey.css" />
+</head>
+<body>
+  <div class="page">
+
+    <!-- 步骤 1：密码门 -->
+    <section id="gate" class="card">
+      <h1>居家护理服务满意度调研</h1>
+      <p class="lead">为持续提升我们的居家护理服务质量，恳请您根据实际服务体验完成本次问卷。问卷仅用于服务质量改进，感谢您的支持与配合。</p>
+      <div class="gate-form">
+        <label for="gatePassword">请输入访问密码</label>
+        <input id="gatePassword" type="password" autocomplete="off" placeholder="由公司提供" />
+        <button id="gateEnter" class="btn-primary">进入问卷</button>
+        <p id="gateError" class="error" hidden>密码错误，请向公司客服索取正确密码。</p>
+      </div>
+    </section>
+
+    <!-- 步骤 2：问卷主表 -->
+    <form id="survey" class="hidden">
+      <h1>居家护理服务满意度调研</h1>
+      <p class="lead">所有题目均为单选，评分越高代表您越满意。</p>
+
+      <section class="card">
+        <h2>基本信息</h2>
+        <div class="grid-2">
+          <div class="field">
+            <label>客户/家属姓名 <span class="req">*</span></label>
+            <input name="customer_name" type="text" required maxlength="50" placeholder="请填写真实姓名" />
+          </div>
+          <div class="field">
+            <label>联系电话 <span class="req">*</span></label>
+            <input name="customer_phone" type="tel" required pattern="[0-9\-+\s]{6,20}" maxlength="20" placeholder="便于回访" />
+          </div>
+          <div class="field">
+            <label>服务日期 <span class="req">*</span></label>
+            <input name="service_date" type="date" required />
+          </div>
+          <div class="field">
+            <label>护理员姓名 <span class="req">*</span></label>
+            <input name="caregiver_name" type="text" required maxlength="50" placeholder="本次服务您的护理员" />
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>一、专业性</h2>
+        <p class="dim">评估护理人员的专业能力和操作规范。</p>
+        <div id="group-professionalism"></div>
+      </section>
+
+      <section class="card">
+        <h2>二、服务态度</h2>
+        <p class="dim">评估护理人员沟通态度、尊重程度与积极回应。</p>
+        <div id="group-attitude"></div>
+      </section>
+
+      <section class="card">
+        <h2>三、服务效率</h2>
+        <p class="dim">评估时间管理、响应速度与流程顺畅度。</p>
+        <div id="group-efficiency"></div>
+      </section>
+
+      <section class="card">
+        <h2>四、情感体验</h2>
+        <p class="dim">评估陪伴感、舒适感与整体推荐意愿。</p>
+        <div id="group-emotion"></div>
+      </section>
+
+      <div class="actions">
+        <button type="submit" class="btn-primary btn-large">提交问卷</button>
+        <p class="dim small">提交后无法修改，请确认所有题目已作答。</p>
+      </div>
+    </form>
+
+    <!-- 提交完成 -->
+    <section id="done" class="card hidden">
+      <div class="done-icon">✓</div>
+      <h1>感谢您的反馈！</h1>
+      <p class="lead">您的意见已提交，公司会持续改进服务质量。</p>
+      <p class="dim">如需补充说明或回访，请联系您的护理顾问。</p>
+    </section>
+
+    <!-- 提交中/错误遮罩 -->
+    <div id="overlay" class="overlay hidden">
+      <div class="spinner"></div>
+      <p id="overlayText">正在提交…</p>
+    </div>
+  </div>
+
+  <script src="/js/survey.js"></script>
+</body>
+</html>

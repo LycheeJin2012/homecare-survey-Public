@@ -1,0 +1,10 @@
+name = "homecare-survey"
+compatibility_date = "2024-09-01"
+pages_build_output_dir = "public"
+
+# D1 数据库绑定（在 Cloudflare Dashboard 建好数据库后填入真实 ID）
+# 本地开发用 --local，首次初始化执行：npm run db:init:local
+[[d1_databases]]
+binding = "DB"
+database_name = "homecare-survey-db"
+database_id = "REPLACE_WITH_REAL_D1_ID"

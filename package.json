@@ -1,0 +1,16 @@
+{
+  "name": "homecare-survey",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "居家护理服务满意度调研系统 — Cloudflare Pages + D1 + Functions",
+  "scripts": {
+    "dev": "wrangler pages dev public --d1=DB --compatibility-date=2024-09-01",
+    "db:init": "wrangler d1 execute homecare-survey-db --file=migrations/0001_init.sql",
+    "db:init:local": "wrangler d1 execute homecare-survey-db --local --file=migrations/0001_init.sql",
+    "deploy": "wrangler pages deploy public"
+  },
+  "devDependencies": {
+    "wrangler": "^3.78.0"
+  }
+}

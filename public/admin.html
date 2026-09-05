@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>调研管理后台</title>
+  <link rel="stylesheet" href="/css/admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+  <!-- 登录页 -->
+  <div id="loginView" class="login-wrap">
+    <form id="loginForm" class="card login-card">
+      <h1>调研管理后台</h1>
+      <p class="dim">请输入管理员密码登录。</p>
+      <label for="loginPwd">管理员密码</label>
+      <input id="loginPwd" type="password" autocomplete="current-password" />
+      <button class="btn-primary" type="submit">登录</button>
+      <p id="loginError" class="error" hidden></p>
+    </form>
+  </div>
+
+  <!-- 主面板 -->
+  <div id="dashboardView" class="dash hidden">
+    <header class="topbar">
+      <div>
+        <h1>调研管理后台</h1>
+        <p class="dim small" id="lastUpdated">—</p>
+      </div>
+      <div class="topbar-actions">
+        <button id="refreshBtn" class="btn-secondary">刷新</button>
+        <button id="exportBtn" class="btn-primary">导出 CSV</button>
+        <button id="logoutBtn" class="btn-secondary">退出</button>
+      </div>
+    </header>
+
+    <!-- 概览卡 -->
+    <section class="kpi-row">
+      <div class="kpi"><div class="kpi-label">总提交数</div><div class="kpi-value" id="kpiTotal">—</div></div>
+      <div class="kpi"><div class="kpi-label">整体均分</div><div class="kpi-value" id="kpiOverall">—</div></div>
+      <div class="kpi"><div class="kpi-label">专业性</div><div class="kpi-value" id="kpiPro">—</div></div>
+      <div class="kpi"><div class="kpi-label">服务态度</div><div class="kpi-value" id="kpiAtt">—</div></div>
+      <div class="kpi"><div class="kpi-label">服务效率</div><div class="kpi-value" id="kpiEff">—</div></div>
+      <div class="kpi"><div class="kpi-label">情感体验</div><div class="kpi-value" id="kpiEmo">—</div></div>
+    </section>
+
+    <!-- 筛选 -->
+    <section class="card filter-card">
+      <div class="filter-row">
+        <div class="field">
+          <label>开始日期</label>
+          <input type="date" id="filterStart" />
+        </div>
+        <div class="field">
+          <label>结束日期</label>
+          <input type="date" id="filterEnd" />
+        </div>
+        <div class="field">
+          <label>护理员</label>
+          <select id="filterCaregiver"><option value="">全部</option></select>
+        </div>
+        <div class="field filter-actions">
+          <button id="applyFilter" class="btn-primary">应用筛选</button>
+          <button id="resetFilter" class="btn-secondary">重置</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 图表 -->
+    <section class="grid-2">
+      <div class="card">
+        <h2>各维度平均分</h2>
+        <div class="chart-wrap"><canvas id="radarChart"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>提交趋势（按日）</h2>
+        <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>各题平均分（1-20 题）</h2>
+        <div class="chart-wrap"><canvas id="questionChart"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>护理员排名（按整体均分）</h2>
+        <div class="chart-wrap"><canvas id="caregiverChart"></canvas></div>
+      </div>
+    </section>
+
+    <!-- 明细表 -->
+    <section class="card">
+      <h2>最近提交</h2>
+      <div class="table-wrap">
+        <table id="submissionsTable">
+          <thead>
+            <tr>
+              <th>提交时间</th>
+              <th>客户</th>
+              <th>电话</th>
+              <th>服务日期</th>
+              <th>护理员</th>
+              <th>专业性</th>
+              <th>态度</th>
+              <th>效率</th>
+              <th>情感</th>
+              <th>均分</th>
+            </tr>
+          </thead>
+          <tbody id="submissionsBody"><tr><td colspan="10" class="dim center">加载中…</td></tr></tbody>
+        </table>
+      </div>
+      <p id="moreHint" class="dim small center" hidden>仅展示最近 50 条；导出 CSV 获取完整数据。</p>
+    </section>
+  </div>
+
+  <script src="/js/admin.js" defer></script>
+</body>
+</html>
