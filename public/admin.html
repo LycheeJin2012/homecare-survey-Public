@@ -3,11 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>调研管理后台</title>
+  <title>调研管理后台 · 居家护理</title>
   <link rel="stylesheet" href="/css/admin.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" defer></script>
 </head>
 <body>
+  <!-- 顶部导航 -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <a href="/" class="brand-link">← 主页</a>
+        <span class="brand-name">调研管理后台</span>
+      </div>
+      <div class="topbar-actions">
+        <button id="refreshBtn" class="btn-secondary">刷新</button>
+        <button id="reportBtn" class="btn-primary" disabled>🤖 AI 报告</button>
+        <button id="exportBtn" class="btn-primary">导出 CSV</button>
+        <button id="logoutBtn" class="btn-secondary">退出</button>
+      </div>
+    </div>
+    <p class="last-updated" id="lastUpdated">—</p>
+  </header>
+
   <!-- 登录页 -->
   <div id="loginView" class="login-wrap">
     <form id="loginForm" class="card login-card">
@@ -22,26 +40,14 @@
 
   <!-- 主面板 -->
   <div id="dashboardView" class="dash hidden">
-    <header class="topbar">
-      <div>
-        <h1>调研管理后台</h1>
-        <p class="dim small" id="lastUpdated">—</p>
-      </div>
-      <div class="topbar-actions">
-        <button id="refreshBtn" class="btn-secondary">刷新</button>
-        <button id="exportBtn" class="btn-primary">导出 CSV</button>
-        <button id="logoutBtn" class="btn-secondary">退出</button>
-      </div>
-    </header>
-
     <!-- 概览卡 -->
     <section class="kpi-row">
       <div class="kpi"><div class="kpi-label">总提交数</div><div class="kpi-value" id="kpiTotal">—</div></div>
       <div class="kpi"><div class="kpi-label">整体均分</div><div class="kpi-value" id="kpiOverall">—</div></div>
-      <div class="kpi"><div class="kpi-label">专业性</div><div class="kpi-value" id="kpiPro">—</div></div>
-      <div class="kpi"><div class="kpi-label">服务态度</div><div class="kpi-value" id="kpiAtt">—</div></div>
-      <div class="kpi"><div class="kpi-label">服务效率</div><div class="kpi-value" id="kpiEff">—</div></div>
-      <div class="kpi"><div class="kpi-label">情感体验</div><div class="kpi-value" id="kpiEmo">—</div></div>
+      <div class="kpi kpi-pro"><div class="kpi-label">专业性</div><div class="kpi-value" id="kpiPro">—</div></div>
+      <div class="kpi kpi-att"><div class="kpi-label">服务态度</div><div class="kpi-value" id="kpiAtt">—</div></div>
+      <div class="kpi kpi-eff"><div class="kpi-label">服务效率</div><div class="kpi-value" id="kpiEff">—</div></div>
+      <div class="kpi kpi-emo"><div class="kpi-label">情感体验</div><div class="kpi-value" id="kpiEmo">—</div></div>
     </section>
 
     <!-- 筛选 -->
@@ -77,7 +83,7 @@
         <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
       </div>
       <div class="card">
-        <h2>各题平均分（1-20 题）</h2>
+        <h2>各题平均分（Q1-Q40）</h2>
         <div class="chart-wrap"><canvas id="questionChart"></canvas></div>
       </div>
       <div class="card">
@@ -88,11 +94,15 @@
 
     <!-- 明细表 -->
     <section class="card">
-      <h2>最近提交</h2>
+      <div class="card-head">
+        <h2>最近提交</h2>
+        <a id="fullListLink" class="dim small" href="/admin/submission">全部明细 →</a>
+      </div>
       <div class="table-wrap">
         <table id="submissionsTable">
           <thead>
             <tr>
+              <th>ID</th>
               <th>提交时间</th>
               <th>客户</th>
               <th>电话</th>
@@ -103,13 +113,32 @@
               <th>效率</th>
               <th>情感</th>
               <th>均分</th>
+              <th>操作</th>
             </tr>
           </thead>
-          <tbody id="submissionsBody"><tr><td colspan="10" class="dim center">加载中…</td></tr></tbody>
+          <tbody id="submissionsBody"><tr><td colspan="12" class="dim center">加载中…</td></tr></tbody>
         </table>
       </div>
       <p id="moreHint" class="dim small center" hidden>仅展示最近 50 条；导出 CSV 获取完整数据。</p>
     </section>
+  </div>
+
+  <!-- AI 报告弹窗 -->
+  <div id="reportModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-content">
+      <div class="modal-head">
+        <h2>🤖 AI 报告</h2>
+        <button class="modal-close" data-close>✕</button>
+      </div>
+      <div class="modal-body" id="reportBody">
+        <p class="dim">报告生成中…通常 30-60 秒。</p>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-secondary" data-close>关闭</button>
+        <button id="copyReport" class="btn-primary" disabled>复制全文</button>
+      </div>
+    </div>
   </div>
 
   <script src="/js/admin.js" defer></script>

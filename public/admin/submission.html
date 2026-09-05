@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>提交详情 · 调研管理后台</title>
+  <link rel="stylesheet" href="/css/admin.css" />
+  <style>
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+    .detail-item .label { color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+    .detail-item .value { font-size: 15px; color: #111827; font-weight: 500; }
+    .detail-item .value.lg { font-size: 22px; font-weight: 700; }
+    .detail-item .value.good { color: #059669; }
+    .detail-item .value.warn { color: #d97706; }
+    .detail-item .value.bad  { color: #dc2626; }
+    @media (max-width: 700px) { .detail-grid { grid-template-columns: 1fr; } }
+    .q-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 12px; margin-top: 12px; }
+    .q-grid .q-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; }
+    .q-grid .q-row .qn { color: #6b7280; min-width: 32px; font-family: ui-monospace, monospace; }
+    .q-grid .q-row .qs { font-weight: 600; }
+    .q-grid .q-row .qbar { flex: 1; height: 6px; background: #f1f5f9; border-radius: 3px; overflow: hidden; }
+    .q-grid .q-row .qbar > div { height: 100%; background: #2563eb; border-radius: 3px; }
+    .section-h { font-size: 14px; font-weight: 600; color: #0f172a; margin: 22px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #e5e7eb; }
+    .back-link { color: #6b7280; font-size: 14px; }
+    .back-link:hover { color: #2563eb; }
+  </style>
+</head>
+<body>
+  <!-- 顶部 -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <a href="/admin" class="brand-link">← 后台</a>
+        <span class="brand-name">提交详情</span>
+      </div>
+      <div class="topbar-actions">
+        <button id="backBtn" class="btn-secondary">返回列表</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dash">
+    <div id="loading" class="card center dim">加载中…</div>
+
+    <div id="content" class="hidden">
+      <section class="card">
+        <h2>基本信息</h2>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="label">提交 ID</div><div class="value id-cell" id="dId">—</div></div>
+          <div class="detail-item"><div class="label">提交时间</div><div class="value" id="dCreatedAt">—</div></div>
+          <div class="detail-item"><div class="label">客户姓名</div><div class="value" id="dName">—</div></div>
+          <div class="detail-item"><div class="label">联系电话</div><div class="value" id="dPhone">—</div></div>
+          <div class="detail-item"><div class="label">服务日期</div><div class="value" id="dServiceDate">—</div></div>
+          <div class="detail-item"><div class="label">护理员</div><div class="value" id="dCaregiver">—</div></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>维度均分</h2>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="label">专业性</div><div class="value lg" id="dPro">—</div></div>
+          <div class="detail-item"><div class="label">服务态度</div><div class="value lg" id="dAtt">—</div></div>
+          <div class="detail-item"><div class="label">服务效率</div><div class="value lg" id="dEff">—</div></div>
+          <div class="detail-item"><div class="label">情感体验</div><div class="value lg" id="dEmo">—</div></div>
+          <div class="detail-item" style="grid-column: 1 / -1;">
+            <div class="label">总均分</div>
+            <div class="value lg" id="dTotal">—</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>40 题详情</h2>
+        <div class="section-h">一、专业性（Q1-Q10）</div>
+        <div class="q-grid" id="qPro"></div>
+        <div class="section-h">二、服务态度（Q11-Q20）</div>
+        <div class="q-grid" id="qAtt"></div>
+        <div class="section-h">三、服务效率（Q21-Q30）</div>
+        <div class="q-grid" id="qEff"></div>
+        <div class="section-h">四、情感体验（Q31-Q40）</div>
+        <div class="q-grid" id="qEmo"></div>
+      </section>
+    </div>
+
+    <div id="error" class="card center hidden" style="color:#ef4444;"></div>
+  </main>
+
+  <script src="/js/submission-detail.js"></script>
+</body>
+</html>

@@ -113,6 +113,78 @@
     window.location.href = `${API.export}${qs}`;
   });
 
+  // ===== AI 报告 =====
+  $('#reportBtn').addEventListener('click', generateReport);
+  $('#copyReport').addEventListener('click', copyReport);
+  document.querySelectorAll('#reportModal [data-close]').forEach((el) => {
+    el.addEventListener('click', closeReport);
+  });
+  let _lastReport = '';
+
+  async function generateReport() {
+    const btn = $('#reportBtn');
+    const modal = $('#reportModal');
+    const body = $('#reportBody');
+    const copyBtn = $('#copyReport');
+    btn.disabled = true;
+    btn.textContent = '🤖 生成中…';
+    modal.classList.remove('hidden');
+    body.innerHTML = '<p class="dim">报告生成中…通常 30-60 秒。</p>';
+    copyBtn.disabled = true;
+    _lastReport = '';
+
+    try {
+      const qs = buildFilterQS();
+      // 把 ?a=1&b=2 改成 body：把参数读出来
+      const sp = new URLSearchParams(qs.startsWith('?') ? qs.slice(1) : '');
+      const body2 = {
+        start: sp.get('start') || '',
+        end: sp.get('end') || '',
+        caregiver: sp.get('caregiver') || '',
+      };
+      const r = await fetch('/api/admin/report', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(body2),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.error || `请求失败（${r.status}）`);
+      _lastReport = data.report || '';
+      // 用 marked 渲染
+      if (window.marked) {
+        body.innerHTML = '<div class="report-content">' + marked.parse(_lastReport) + '</div>';
+      } else {
+        body.textContent = _lastReport;
+      }
+      body.scrollTop = 0;
+      copyBtn.disabled = false;
+    } catch (e) {
+      body.innerHTML = `<p style="color:#ef4444;">生成失败：${escapeHtml(e.message)}</p>
+        <p class="dim small" style="margin-top:12px;">提示：检查 Cloudflare Pages 环境变量 <code>LLM_BASE_URL / LLM_API_KEY / LLM_MODEL</code> 是否已配置。</p>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🤖 AI 报告';
+    }
+  }
+
+  function closeReport() {
+    $('#reportModal').classList.add('hidden');
+  }
+
+  async function copyReport() {
+    if (!_lastReport) return;
+    try {
+      await navigator.clipboard.writeText(_lastReport);
+      const btn = $('#copyReport');
+      const old = btn.textContent;
+      btn.textContent = '✓ 已复制';
+      setTimeout(() => { btn.textContent = old; }, 1500);
+    } catch (_) {
+      alert('复制失败，请手动选择文本复制');
+    }
+  }
+
   function buildFilterQS() {
     const params = new URLSearchParams();
     const s = $('#filterStart').value;
@@ -256,6 +328,7 @@
     tbody.innerHTML = items.map((it) => {
       const sc = (v) => `<td class="score-cell ${scoreClass(v)}">${fmt(v)}</td>`;
       return `<tr>
+        <td class="id-cell">#${it.id}</td>
         <td>${escapeHtml(it.created_at)}</td>
         <td>${escapeHtml(it.customer_name)}</td>
         <td>${escapeHtml(it.customer_phone)}</td>
@@ -263,6 +336,7 @@
         <td>${escapeHtml(it.caregiver_name)}</td>
         ${sc(it.professionalism)}${sc(it.attitude)}${sc(it.efficiency)}${sc(it.emotion)}
         <td class="score-cell ${scoreClass(it.total_score)}"><b>${fmt(it.total_score)}</b></td>
+        <td><a class="act-btn" href="/admin/submission.html?id=${it.id}">查看</a></td>
       </tr>`;
     }).join('');
     $('#moreHint').hidden = items.length < 50;
