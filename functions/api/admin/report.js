@@ -1,5 +1,5 @@
 /* POST /api/admin/report
- * AI 报告生成：基于当前 stats + 样本明细，调 LLM 生成 2000 字分析报告
+ * AI 报告生成：基于当前 stats + 样本明细，调 LLM 生成 800 字分析报告
  * 流式返回 SSE（text/event-stream）
  *
  * 需要 admin session
@@ -76,7 +76,7 @@ export async function onRequestPost(context) {
   const top3 = sortedQ.slice(0, 5);
   const bottom3 = sortedQ.slice(-5).reverse();
 
-  // ===== 组装 prompt（用中文，要求 2000 字结构化报告）=====
+  // ===== 组装 prompt（用中文，要求 800 字结构化报告）=====
   const total = overview.total || 0;
   const overall = round2(overview.overall || 0);
   const filterDesc = where.length
@@ -107,7 +107,7 @@ ${trend.length ? trend.map((t) => `${t.date}: ${round2(t.overall)} (n=${t.n})`).
 【护理员排名（TOP 10）】
 ${ranking.slice(0, 10).map((r, i) => `${i + 1}. ${r.name} — 整体 ${round2(r.overall)} | 提交 ${r.n}`).join('\n') || '（无）'}
 
-请基于以上数据，生成结构化报告（约 2000 字）。`;
+请基于以上数据，生成结构化报告（约 800 字）。`;
 
   const systemPrompt = `你是「居家护理服务质量分析专家」，擅长把数据转成可执行的运营洞察。
 
@@ -126,8 +126,8 @@ ${ranking.slice(0, 10).map((r, i) => `${i + 1}. ${r.name} — 整体 ${round2(r.
 9. 调研方法局限说明
 10. 附录：数据明细
 
-【字数】约 2000 字（允许 ±20% 浮动）。不足 1600 字扣分，超过 2400 字扣分。
-【说明】CF Pages Functions 单次调用有 CPU 时间上限，控制在 30s 内能跑完。
+【字数】约 800 字（允许 ±20% 浮动）。不足 600 字扣分，超过 1000 字扣分。
+【说明】CF Pages Functions 免费版 wall clock 上限 30s，按 MiniMax-M3 ~40 tokens/秒算，800 字是上限。
 【禁止】不要编造数据（所有结论必须基于上面给的数据快照）；不要给法律/医疗建议。`;
 
   // ===== 调 LLM（OpenAI 兼容 chat completions，非流式）=====
@@ -144,7 +144,7 @@ ${ranking.slice(0, 10).map((r, i) => `${i + 1}. ${r.name} — 整体 ${round2(r.
         { role: 'user', content: userBlock },
       ],
       temperature: 0.7,
-      max_tokens: 3500,
+      max_tokens: 1200,
       stream: false,
     }),
   });
