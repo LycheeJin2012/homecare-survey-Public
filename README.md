@@ -113,3 +113,4 @@ gh repo create homecare-survey --public --source=. --push
 均分 4.5–5.0 优秀 / 4.0–4.49 良好 / 3.5–3.99 基本满意 / 3.0–3.49 需要改进 / <3.0 重点关注。
 # triggered CF Pages deploy at 2026-09-05T08:10:19Z
 # env vars PATCH
+
