@@ -7,4 +7,4 @@ pages_build_output_dir = "public"
 [[d1_databases]]
 binding = "DB"
 database_name = "homecare-survey-db"
-database_id = "REPLACE_WITH_REAL_D1_ID"
+database_id = "eb4a62f0-a2ae-49ab-b2b9-2c268dda5c40"
