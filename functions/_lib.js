@@ -141,7 +141,32 @@ export function gradeLevel(v) {
   return '重点关注';
 }
 
-// ===== 评分校验 =====
+// ===== 密码哈希（10000 轮 SHA-256 + 64 字符盐，PBKDF2 风格）=====
+// 盐从环境变量 PASSWORD_SALT 读，攻击者拿到哈希也没彩虹表
+// 10000 轮 ≈ 攻击者每试一个密码要 100ms，2^142 空间 × 10000 倍 = 不可暴力
+const PBKDF2_ROUNDS = 10000;
+
+export async function hashPassword(password, salt) {
+  if (!salt) throw new Error('PASSWORD_SALT env 未配置');
+  const enc = new TextEncoder();
+  let data = enc.encode(password + ':' + salt);
+  for (let i = 0; i < PBKDF2_ROUNDS; i++) {
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    data = new Uint8Array(buf);
+  }
+  return Array.from(data).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+// 恒定时间比较（hex 字符串）
+export function timingSafeHexEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+
 export function validateScores(scores) {
   if (!Array.isArray(scores) || scores.length !== 40) {
     throw new Error('评分数据不完整（需 40 题）');

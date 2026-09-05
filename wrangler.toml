@@ -2,9 +2,13 @@ name = "homecare-survey"
 compatibility_date = "2024-09-01"
 pages_build_output_dir = "public"
 
-# D1 数据库绑定（在 Cloudflare Dashboard 建好数据库后填入真实 ID）
-# 本地开发用 --local，首次初始化执行：npm run db:init:local
+# D1 数据库绑定
 [[d1_databases]]
 binding = "DB"
 database_name = "homecare-survey-db"
 database_id = "eb4a62f0-a2ae-49ab-b2b9-2c268dda5c40"
+
+# 注意：CF Pages Functions runtime 不从 wrangler.toml [vars] 读 vars
+# （实测：6 个 vars 写进 wrangler.toml 部署后 Functions 仍然 500 "未配置"）
+# 所有 env vars 必须在 CF Dashboard UI 加（Settings → Variables and Secrets）
+# 此文件只保留 D1 binding 用于本地 wrangler pages dev 和 wrangler.toml 跟踪
