@@ -64,6 +64,13 @@
   function showDashboard() {
     $('#loginView').classList.add('hidden');
     $('#dashboardView').classList.remove('hidden');
+    // 启用所有需要登录后才能用的按钮
+    const reportBtn = $('#reportBtn');
+    if (reportBtn) reportBtn.disabled = false;
+    const exportBtn = $('#exportBtn');
+    if (exportBtn) exportBtn.disabled = false;
+    const refreshBtn = $('#refreshBtn');
+    if (refreshBtn) refreshBtn.disabled = false;
   }
 
   // ===== 登录 =====
