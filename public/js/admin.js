@@ -182,10 +182,11 @@
         caregiver: sp.get('caregiver') || '',
       };
 
-      // 10 个分批并行（每批 3 个，避免 LLM 端并发限流）
-      const BATCH = 3;
+      // 10 个纯顺序（MiniMax-M3 端有并发限流，并发会让 50%+ 段返回空）
+      // 总耗时 ≈ 10 × 25s ≈ 4-5 分钟；每完成一段立即渲染
       const indices = Array.from({ length: 10 }, (_, i) => i);
-      async function runOne(i) {
+      const INTERVAL_MS = 500; // 段间小间隔，让 LLM 端喘口气
+      for (const i of indices) {
         slotStatus[i] = 'loading';
         renderProgress();
         try {
@@ -205,10 +206,7 @@
           slotErrors[i] = e.message;
         }
         renderProgress();
-      }
-      for (let s = 0; s < indices.length; s += BATCH) {
-        const slice = indices.slice(s, s + BATCH);
-        await Promise.all(slice.map(runOne));
+        if (i < indices.length - 1) await new Promise((r) => setTimeout(r, INTERVAL_MS));
       }
 
       // 收尾：清掉进度条
