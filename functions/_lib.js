@@ -106,13 +106,18 @@ export function clearAdminCookie() {
 }
 
 // ===== 维度计算 =====
+// 4 维度 × 10 题 = 40 题
+//   Q1-Q10  专业性
+//   Q11-Q20 服务态度
+//   Q21-Q30 服务效率
+//   Q31-Q40 情感体验
 export function calcDimensions(scores) {
-  // scores: 长度 20 的数组
+  // scores: 长度 40 的数组
   const avg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
-  const p = avg(scores.slice(0, 5));
-  const a = avg(scores.slice(5, 10));
-  const e = avg(scores.slice(10, 15));
-  const m = avg(scores.slice(15, 20));
+  const p = avg(scores.slice(0, 10));
+  const a = avg(scores.slice(10, 20));
+  const e = avg(scores.slice(20, 30));
+  const m = avg(scores.slice(30, 40));
   const t = (p + a + e + m) / 4;
   return {
     professionalism: round2(p),
@@ -138,10 +143,10 @@ export function gradeLevel(v) {
 
 // ===== 评分校验 =====
 export function validateScores(scores) {
-  if (!Array.isArray(scores) || scores.length !== 20) {
-    throw new Error('评分数据不完整（需 20 题）');
+  if (!Array.isArray(scores) || scores.length !== 40) {
+    throw new Error('评分数据不完整（需 40 题）');
   }
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 40; i++) {
     const v = scores[i];
     if (!Number.isInteger(v) || v < 1 || v > 5) {
       throw new Error(`第 ${i + 1} 题评分无效`);

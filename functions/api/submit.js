@@ -1,5 +1,5 @@
 /* POST /api/submit
- * 提交问卷：校验 cookie + 评分 + 写入 D1
+ * 提交问卷：校验 cookie + 40 题评分 + 写入 D1
  */
 
 import {
@@ -34,15 +34,18 @@ export async function onRequestPost(context) {
   const dim = calcDimensions(scores);
   const ua = (request.headers.get('user-agent') || '').slice(0, 500);
 
+  // 40 个 q 字段 + 4 个维度 + 1 个总均分 + 4 个元数据 + 1 个 UA = 50 个字段
   try {
     const result = await DB.prepare(`
       INSERT INTO submissions (
         customer_name, customer_phone, service_date, caregiver_name,
         q1, q2, q3, q4, q5, q6, q7, q8, q9, q10,
         q11, q12, q13, q14, q15, q16, q17, q18, q19, q20,
+        q21, q22, q23, q24, q25, q26, q27, q28, q29, q30,
+        q31, q32, q33, q34, q35, q36, q37, q38, q39, q40,
         professionalism, attitude, efficiency, emotion, total_score,
         user_agent
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     `).bind(
       customer_name, customer_phone, service_date, caregiver_name,
       ...scores, dim.professionalism, dim.attitude, dim.efficiency, dim.emotion, dim.total_score,

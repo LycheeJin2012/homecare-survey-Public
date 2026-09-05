@@ -5,7 +5,7 @@
 
 import { env, err, json, readAdminSession, round2 } from '../../_lib.js';
 
-const QUESTION_COLS = Array.from({ length: 20 }, (_, i) => `q${i + 1}`).join(', ');
+const QUESTION_COLS = Array.from({ length: 40 }, (_, i) => `q${i + 1}`).join(', ');
 
 export async function onRequestGet(context) {
   const { ADMIN_SESSION_SECRET } = env(context);
@@ -95,8 +95,8 @@ export async function onRequestGet(context) {
     const [overview, trend, ranking, caregivers, qRow] = batch.map((r) => r.results || []);
     const o = overview[0] || {};
     const qAvg = qRow[0] || {};
-    const questionAverages = QUESTION_COLS.split(',').map((_, i) => {
-      const v = qAvg[`q${i + 1}`];
+    const questionAverages = QUESTION_COLS.split(',').map((col) => {
+      const v = qAvg[col.trim()];
       return v == null ? 0 : round2(v);
     });
 
