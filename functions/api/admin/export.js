@@ -1,5 +1,8 @@
-/* GET /api/admin/export?start=&end=&caregiver=
- * 导出 CSV（带 BOM，Excel 打开中文不乱码）
+/* GET /api/admin/export?start=&end=&caregiver=&format=csv|xlsx
+ * 导出调研数据
+ *   format=csv  (默认)  CSV + UTF-8 BOM，Excel 双击不乱码
+ *   format=xlsx         Excel 2003 XML（SpreadsheetML），纯字符串拼接
+ *                        无需 zip 库；Excel / WPS / Numbers 全支持；中文完美
  */
 
 import { env, err, readAdminSession } from '../../_lib.js';
@@ -33,6 +36,7 @@ export async function onRequestGet(context) {
   const start = (url.searchParams.get('start') || '').trim();
   const end   = (url.searchParams.get('end') || '').trim();
   const caregiver = (url.searchParams.get('caregiver') || '').trim();
+  const format = (url.searchParams.get('format') || 'csv').toLowerCase();
 
   const where = [];
   const binds = [];
@@ -46,26 +50,30 @@ export async function onRequestGet(context) {
       SELECT * FROM submissions ${whereSql} ORDER BY id ASC
     `).bind(...binds).all();
 
-    const header = COLUMNS.map((c) => csvCell(c[1])).join(',');
-    const rows = (results || []).map((row) => {
-      return COLUMNS.map(([k]) => csvCell(row[k])).join(',');
-    });
-    // \uFEFF BOM 让 Excel 正确识别 UTF-8
-    const body = '\uFEFF' + header + '\n' + rows.join('\n');
-
     const ts = new Date().toISOString().slice(0, 10);
-    return new Response(body, {
-      status: 200,
-      headers: {
-        'content-type': 'text/csv; charset=utf-8',
-        'content-disposition': `attachment; filename="survey-${ts}.csv"`,
-        'cache-control': 'no-store',
-      },
-    });
+    if (format === 'xlsx' || format === 'xls') {
+      return xlsxResponse(results || [], ts);
+    }
+    return csvResponse(results || [], ts);
   } catch (e) {
     console.error('export error:', e);
     return err('导出失败', 500);
   }
+}
+
+// ===== CSV 导出 =====
+function csvResponse(rows, ts) {
+  const header = COLUMNS.map((c) => csvCell(c[1])).join(',');
+  const body = rows.map((row) => COLUMNS.map(([k]) => csvCell(row[k])).join(',')).join('\n');
+  // \uFEFF BOM 让 Excel 正确识别 UTF-8
+  return new Response('\uFEFF' + header + '\n' + body, {
+    status: 200,
+    headers: {
+      'content-type': 'text/csv; charset=utf-8',
+      'content-disposition': `attachment; filename="survey-${ts}.csv"`,
+      'cache-control': 'no-store',
+    },
+  });
 }
 
 function csvCell(v) {
@@ -75,4 +83,73 @@ function csvCell(v) {
     return '"' + s.replace(/"/g, '""') + '"';
   }
   return s;
+}
+
+// ===== Excel 2003 XML 导出（SpreadsheetML）=====
+// 这种格式 Excel 2003+ / WPS / Numbers 全能打开，UTF-8 中文完美
+// 不是 OOXML (.xlsx zip)，但兼容性足够，纯字符串拼接
+function xlsxResponse(rows, ts) {
+  const xmlRows = [];
+  // 表头
+  xmlRows.push('<Row>' + COLUMNS.map((c) => xlsxCell(c[1], 'String', true)).join('') + '</Row>');
+  // 数据
+  for (const r of rows) {
+    xmlRows.push('<Row>' + COLUMNS.map(([k]) => {
+      const v = r[k];
+      // 数字列直接用 Number，节省空间
+      const numCols = new Set(['id', 'professionalism', 'attitude', 'efficiency', 'emotion', 'total_score']);
+      for (let i = 1; i <= 40; i++) numCols.add(`q${i}`);
+      if (v == null || v === '') return '<Cell><Data ss:Type="String"></Data></Cell>';
+      if (numCols.has(k) && Number.isFinite(Number(v))) {
+        return xlsxCell(Number(v), 'Number', false);
+      }
+      return xlsxCell(String(v), 'String', false);
+    }).join('') + '</Row>');
+  }
+
+  const body = `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Font ss:FontName="宋体" ss:Size="11"/>
+   <Alignment ss:Vertical="Center" ss:WrapText="1"/>
+  </Style>
+  <Style ss:ID="Header">
+   <Font ss:FontName="微软雅黑" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#3B82F6" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="调研数据">
+  <Table>
+${xmlRows.join('\n')}
+  </Table>
+ </Worksheet>
+</Workbook>`;
+
+  return new Response(body, {
+    status: 200,
+    headers: {
+      'content-type': 'application/vnd.ms-excel; charset=utf-8',
+      'content-disposition': `attachment; filename="survey-${ts}.xls"`,
+      'cache-control': 'no-store',
+    },
+  });
+}
+
+function xlsxCell(value, type, isHeader) {
+  // 简单的 XML 转义
+  const escaped = String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+  const style = isHeader ? ' ss:StyleID="Header"' : '';
+  return `<Cell${style}><Data ss:Type="${type}">${escaped}</Data></Cell>`;
 }

@@ -7,6 +7,7 @@ const COOKIE_ADMIN  = 'admin_session';
 const COOKIE_OPTS_BASE = 'Path=/; HttpOnly; SameSite=Strict; Secure';
 
 // ===== JSON 响应 =====
+// 调用方传啥就回啥，不包 ok/data 包装（避免破坏前端 data.x 访问模式）
 export function json(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data), {
     status,
@@ -15,8 +16,23 @@ export function json(data, status = 200, extraHeaders = {}) {
 }
 
 // ===== 错误响应 =====
-export function err(message, status = 400) {
-  return json({ error: message }, status);
+// 统一格式 {ok:false, error, code}（前端继续用 data.error 解析，code 字段是新增的可选调试信息）
+const ERROR_CODES = {
+  400: 'BAD_REQUEST',
+  401: 'UNAUTHORIZED',
+  403: 'FORBIDDEN',
+  404: 'NOT_FOUND',
+  500: 'INTERNAL',
+  502: 'UPSTREAM',
+  503: 'UNAVAILABLE',
+};
+export function err(message, status = 400, extra = {}) {
+  return json({
+    ok: false,
+    error: message,
+    code: ERROR_CODES[status] || 'ERROR',
+    ...extra,
+  }, status);
 }
 
 // ===== 读环境变量（兼容 Pages env 与 wrangler .dev.vars） =====

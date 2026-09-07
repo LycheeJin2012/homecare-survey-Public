@@ -20,6 +20,8 @@ export async function onRequestGet(context) {
   let limit = parseInt(url.searchParams.get('limit') || '50', 10);
   if (!Number.isFinite(limit) || limit <= 0) limit = 50;
   if (limit > 500) limit = 500;
+  let offset = parseInt(url.searchParams.get('offset') || '0', 10);
+  if (!Number.isFinite(offset) || offset < 0) offset = 0;
 
   const where = [];
   const binds = [];
@@ -29,6 +31,11 @@ export async function onRequestGet(context) {
   const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
 
   try {
+    // 同时拿总数（用于前端显示"共 N 条"和分页）
+    const countRow = (await DB.prepare(
+      `SELECT COUNT(*) as total FROM submissions ${whereSql}`
+    ).bind(...binds).all()).results?.[0] || { total: 0 };
+
     const { results } = await DB.prepare(`
       SELECT
         id, customer_name, customer_phone, service_date, caregiver_name,
@@ -37,10 +44,15 @@ export async function onRequestGet(context) {
       FROM submissions
       ${whereSql}
       ORDER BY id DESC
-      LIMIT ?
-    `).bind(...binds, limit).all();
+      LIMIT ? OFFSET ?
+    `).bind(...binds, limit, offset).all();
 
-    return json({ items: results || [] });
+    return json({
+      items: results || [],
+      total: countRow.total,
+      limit,
+      offset,
+    });
   } catch (e) {
     console.error('submissions error:', e);
     return err('查询失败', 500);

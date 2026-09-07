@@ -203,6 +203,103 @@ tbody tr:hover { background: #fafbfc; }
 .report-content strong { color: #111827; }
 .report-content em { color: #6b7280; font-style: normal; }
 
+/* 打印 / 导出 PDF 样式 */
+@media print {
+  /* 隐藏所有非报告内容 */
+  body > *:not(#reportModal),
+  .modal-backdrop,
+  .modal-head,
+  .modal-foot,
+  .report-progress,
+  .btn-primary,
+  .btn-secondary,
+  nav, header, aside { display: none !important; }
+
+  /* 报告 modal 变成全屏文档 */
+  #reportModal { position: static !important; background: #fff !important; }
+  #reportModal .modal-content {
+    box-shadow: none !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+  }
+  .modal-body { padding: 0 !important; max-height: none !important; overflow: visible !important; }
+
+  /* 报告样式优化：黑白打印友好 */
+  .report-content {
+    font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "WenQuanYi Micro Hei", sans-serif;
+    font-size: 11pt;
+    line-height: 1.7;
+    color: #000;
+  }
+  .report-content h1 {
+    font-size: 18pt;
+    text-align: center;
+    margin: 0 0 8pt;
+    border-bottom: 2pt solid #000;
+    padding-bottom: 8pt;
+  }
+  .report-content h2 {
+    font-size: 14pt;
+    margin: 16pt 0 8pt;
+    border-bottom: 0.5pt solid #999;
+    padding-bottom: 4pt;
+    page-break-after: avoid;
+  }
+  .report-content h3 {
+    font-size: 12pt;
+    margin: 12pt 0 6pt;
+    page-break-after: avoid;
+  }
+  .report-content p, .report-content li { margin: 0 0 6pt; }
+  .report-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8pt 0;
+    page-break-inside: avoid;
+  }
+  .report-content th, .report-content td {
+    border: 0.5pt solid #999;
+    padding: 4pt 6pt;
+    font-size: 10pt;
+  }
+  .report-content th { background: #f0f0f0 !important; }
+  .report-content ul, .report-content ol { padding-left: 20pt; }
+  .report-content blockquote {
+    border-left: 3pt solid #ccc;
+    padding-left: 8pt;
+    color: #555;
+    margin: 6pt 0;
+  }
+  .report-content strong { color: #000; }
+
+  /* 报告前加个打印头 */
+  .report-print-header {
+    display: block !important;
+    text-align: center;
+    font-size: 9pt;
+    color: #666;
+    margin-bottom: 16pt;
+    border-bottom: 0.5pt dashed #999;
+    padding-bottom: 6pt;
+  }
+  .report-print-header .meta { font-size: 8pt; margin-top: 2pt; }
+
+  /* 页面设置 */
+  @page {
+    size: A4;
+    margin: 20mm 18mm 22mm 18mm;
+  }
+
+  /* 避免段内分页 */
+  .report-content p, .report-content li { page-break-inside: avoid; }
+  /* 避免孤行/孤头 */
+  .report-content h1, .report-content h2, .report-content h3 { page-break-after: avoid; }
+}
+
+/* 屏幕上看不见 print header */
+.report-print-header { display: none; }
+
 /* 分段生成进度 */
 .report-progress { padding: 0 0 14px; border-bottom: 1px dashed #e5e7eb; margin-bottom: 14px; }
 .report-progress-bar { height: 6px; background: #f3f4f6; border-radius: 3px; margin-top: 6px; overflow: hidden; }

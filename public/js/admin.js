@@ -114,30 +114,38 @@
     loadAll();
   });
 
-  // ===== 导出 =====
+  // ===== 导出 Excel =====
   $('#exportBtn').addEventListener('click', () => {
     const qs = buildFilterQS();
-    window.location.href = `${API.export}${qs}`;
+    // qs 已经包含 ?，所以直接拼 &format=xlsx
+    const sep = qs && qs !== '?' ? '&' : '?';
+    window.location.href = `${API.export}${qs}${sep}format=xlsx`;
   });
 
   // ===== AI 报告 =====
   $('#reportBtn').addEventListener('click', generateReport);
   $('#copyReport').addEventListener('click', copyReport);
+  $('#printReport').addEventListener('click', printReport);
   document.querySelectorAll('#reportModal [data-close]').forEach((el) => {
     el.addEventListener('click', closeReport);
   });
   let _lastReport = '';
+  let _reportMeta = null;
 
   async function generateReport() {
     const btn = $('#reportBtn');
     const modal = $('#reportModal');
     const body = $('#reportBody');
     const copyBtn = $('#copyReport');
+    const printBtn = $('#printReport');
     btn.disabled = true;
     btn.textContent = '🤖 生成中…';
     modal.classList.remove('hidden');
     copyBtn.disabled = true;
+    printBtn.disabled = true;
     _lastReport = '';
+    // 缓存 report meta 给 print header 用
+    _reportMeta = { generatedAt: new Date().toLocaleString('zh-CN'), model: 'MiniMax-M3' };
 
     // 准备 10 个空槽位
     const slots = new Array(10).fill(null);
@@ -222,6 +230,11 @@
       body.innerHTML = `<div class="report-content">${finalHtml}</div>`;
       body.scrollTop = 0;
       copyBtn.disabled = false;
+      // 至少有一段成功就启用 PDF 导出
+      if (slots.some((c, i) => slotStatus[i] === 'done' && c)) {
+        printBtn.disabled = false;
+        injectPrintHeader(body);
+      }
     } catch (e) {
       body.innerHTML = `<p style="color:#ef4444;">生成失败：${escapeHtml(e.message)}</p>
         <p class="dim small" style="margin-top:12px;">提示：检查 Cloudflare Pages 环境变量 <code>LLM_BASE_URL / LLM_API_KEY / LLM_MODEL</code> 是否已配置。</p>`;
@@ -233,6 +246,35 @@
 
   function closeReport() {
     $('#reportModal').classList.add('hidden');
+  }
+
+  // 在报告顶部插入打印头（仅打印时显示）
+  function injectPrintHeader(body) {
+    if (body.querySelector('.report-print-header')) return;
+    const meta = _reportMeta || {};
+    const header = document.createElement('div');
+    header.className = 'report-print-header';
+    header.innerHTML = `居家护理服务质量分析报告<div class="meta">生成时间：${escapeHtml(meta.generatedAt || '')} · 模型：${escapeHtml(meta.model || '')} · 平台：homecare-survey.pages.dev</div>`;
+    const content = body.querySelector('.report-content');
+    if (content) content.insertBefore(header, content.firstChild);
+  }
+
+  // 导出 PDF：浏览器原生打印 → 选"另存为 PDF"
+  function printReport() {
+    if (!_lastReport) return;
+    const btn = $('#printReport');
+    const old = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '⏳ 准备中…';
+    // 给浏览器一点时间更新 DOM
+    setTimeout(() => {
+      try {
+        window.print();
+      } finally {
+        btn.textContent = old;
+        btn.disabled = false;
+      }
+    }, 100);
   }
 
   async function copyReport() {

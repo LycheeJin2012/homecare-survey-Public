@@ -100,6 +100,12 @@ export async function onRequestGet(context) {
       return v == null ? 0 : round2(v);
     });
 
+    // 缓存 5 分钟：同筛选条件短时间内重复请求复用结果
+    // 筛选参数已经反映在 body（POST），所以 Vary 用 body 哈希
+    // 简化做法：所有 stats 请求共享 5 分钟缓存，靠 filter 不在 URL 里则 CDM 不影响
+    const cacheHeaders = {
+      'cache-control': 'private, max-age=300, stale-while-revalidate=60',
+    };
     return json({
       total: o.total || 0,
       professionalism: round2(o.professionalism || 0),
@@ -126,7 +132,7 @@ export async function onRequestGet(context) {
       })),
       caregivers: (caregivers || []).map((r) => r.name).filter(Boolean),
       questionAverages,
-    });
+    }, 200, cacheHeaders);
   } catch (e) {
     console.error('stats error:', e);
     return err('统计查询失败', 500);
