@@ -1,5 +1,48 @@
 /* 主页 JS — 拉公开 stats + 最近 10 条填写预览（脱敏）*/
 
+/* ===== 轮播控制 ===== */
+function initCarousel() {
+  const track = document.getElementById('carouselTrack');
+  if (!track) return;
+  const slides = track.querySelectorAll('.carousel-slide');
+  const dots = document.querySelectorAll('.carousel-dot');
+  const prev = document.getElementById('carouselPrev');
+  const next = document.getElementById('carouselNext');
+  const viewport = track.parentElement;
+  const N = slides.length;
+  let idx = 0;
+  let timer = null;
+
+  function go(n) {
+    idx = (n + N) % N;
+    track.style.transform = `translateX(-${idx * 100}%)`;
+    slides.forEach((s, i) => s.classList.toggle('is-active', i === idx));
+    dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
+  }
+  function start() { stop(); timer = setInterval(() => go(idx + 1), 4500); }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+  if (prev) prev.addEventListener('click', () => { go(idx - 1); start(); });
+  if (next) next.addEventListener('click', () => { go(idx + 1); start(); });
+  dots.forEach((d) => {
+    d.addEventListener('click', () => { go(Number(d.dataset.idx)); start(); });
+  });
+  // 鼠标悬停暂停
+  viewport.addEventListener('mouseenter', stop);
+  viewport.addEventListener('mouseleave', start);
+  // 触摸滑动支持
+  let touchX = 0;
+  viewport.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; stop(); }, { passive: true });
+  viewport.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1));
+    start();
+  });
+
+  slides[0].classList.add('is-active');
+  start();
+}
+
 (function () {
   'use strict';
 
@@ -96,4 +139,7 @@
 
   loadMeta();
   loadRecent();
+
+  // ===== 3 张图轮播 =====
+  initCarousel();
 })();

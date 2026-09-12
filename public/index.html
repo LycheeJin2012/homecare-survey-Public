@@ -65,8 +65,37 @@
     </div>
   </section>
 
+  <!-- 3 张图轮播 -->
+  <section class="carousel" aria-label="服务展示">
+    <div class="container">
+      <div class="carousel-viewport">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="carousel-slide">
+            <img src="/img/tech-banner.jpg" alt="技术服务" loading="lazy" />
+            <div class="carousel-caption"><h3>赋能智能时代</h3><p>尖端技术服务 · 一站式调研系统</p></div>
+          </div>
+          <div class="carousel-slide">
+            <img src="/img/data-analytics.jpg" alt="数据分析" loading="lazy" />
+            <div class="carousel-caption"><h3>数据驱动决策</h3><p>实时统计 · 智能分析 · 维度洞察</p></div>
+          </div>
+          <div class="carousel-slide">
+            <img src="/img/team-service.jpg" alt="专业团队" loading="lazy" />
+            <div class="carousel-caption"><h3>专业团队 · 客户至上</h3><p>技术赋能 · 服务保障</p></div>
+          </div>
+        </div>
+        <button class="carousel-arrow carousel-prev" id="carouselPrev" aria-label="上一张">‹</button>
+        <button class="carousel-arrow carousel-next" id="carouselNext" aria-label="下一张">›</button>
+      </div>
+      <div class="carousel-dots" id="carouselDots">
+        <button class="carousel-dot is-active" data-idx="0" aria-label="第 1 张"></button>
+        <button class="carousel-dot" data-idx="1" aria-label="第 2 张"></button>
+        <button class="carousel-dot" data-idx="2" aria-label="第 3 张"></button>
+      </div>
+    </div>
+  </section>
+
   <!-- 4 维度介绍：data-analytics 作背景 -->
-  <section class="dims has-bg" id="about">
+  <section class="dims" id="about">
     <div class="container">
       <h2 class="section-title">调研的 4 个维度</h2>
       <p class="section-sub">从专业、态度、效率、情感全面评估护理服务</p>
