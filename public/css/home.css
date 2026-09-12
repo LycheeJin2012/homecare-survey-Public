@@ -187,3 +187,97 @@ a { color: inherit; text-decoration: none; }
 .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
 .footer-links { display: flex; align-items: center; gap: 10px; color: #94a3b8; }
 .footer-links a:hover { color: #fff; }
+
+/* ===== 公司介绍 ===== */
+.company { padding: 80px 0 60px; background: #fff; }
+.company .section-title { font-size: 32px; margin: 0 0 8px; text-align: center; }
+.company .section-sub { color: #6b7280; text-align: center; margin: 0 0 36px; font-size: 15px; }
+
+.company-intro {
+  max-width: 880px;
+  margin: 0 auto 48px;
+  font-size: 15.5px;
+  line-height: 1.85;
+  color: #374151;
+}
+.company-intro p { margin: 0 0 14px; }
+.company-intro p:last-child { margin-bottom: 0; }
+
+/* 4 个能力卡片 */
+.capability-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin: 0 0 48px;
+}
+.cap-card {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px 18px;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.cap-card:hover {
+  transform: translateY(-3px);
+  border-color: #93c5fd;
+  box-shadow: 0 8px 24px rgba(37,99,235,0.10);
+}
+.cap-icon { font-size: 32px; margin-bottom: 10px; }
+.cap-card h4 {
+  font-size: 15px;
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-weight: 600;
+}
+.cap-card p {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* 3 张图：1 大 + 2 小 */
+.company-gallery {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 16px;
+  margin-top: 8px;
+}
+.gallery-item {
+  margin: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(15,23,42,0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+  background: #f1f5f9;
+  aspect-ratio: 16/9;
+}
+.gallery-large { aspect-ratio: 16/7.5; }
+.gallery-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(15,23,42,0.14);
+}
+.gallery-item img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.gallery-item figcaption {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: #fff;
+  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.65) 100%);
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 900px) {
+  .capability-grid { grid-template-columns: repeat(2, 1fr); }
+  .company-gallery { grid-template-columns: 1fr; }
+  .gallery-large, .gallery-item { aspect-ratio: 16/9; }
+  .company { padding: 60px 0 40px; }
+  .company .section-title { font-size: 26px; }
+}
