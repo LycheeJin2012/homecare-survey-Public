@@ -16,7 +16,6 @@
       </div>
       <nav class="topbar-nav">
         <a href="#about">关于</a>
-        <a href="#company">关于我们</a>
         <a href="#recent">最近反馈</a>
         <a href="/survey" class="btn-primary btn-sm">填写问卷</a>
         <a href="/admin" class="topbar-admin">管理</a>
@@ -24,8 +23,8 @@
     </div>
   </header>
 
-  <!-- Hero -->
-  <section class="hero">
+  <!-- Hero + 公司介绍合并：tech-banner 作背景 -->
+  <section class="hero" id="company">
     <div class="container">
       <div class="hero-grid">
         <div class="hero-text">
@@ -48,28 +47,26 @@
           <div class="art-blob"></div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- 公司介绍（精简） -->
-  <section class="company" id="company">
-    <div class="container">
-      <h2 class="section-title">关于上海瑛缇信息科技</h2>
-      <p class="section-sub">技术驱动 · 数据赋能 · 持续创新</p>
-      <div class="company-intro">
-        <p>上海瑛缇信息科技有限公司立足计算机软件技术领域，专注互联网数字化调研相关技术服务。依托软件开发与系统集成能力，提供调研表单系统开发、多渠道问卷采集、数据汇总整理等一体化解决方案，以技术赋能各类调研项目，帮助客户高效完成信息收集与反馈分析。</p>
-      </div>
-      <div class="capability-grid">
-        <div class="cap-card"><div class="cap-icon">📋</div><h4>表单系统开发</h4><p>定制问卷 · 多题型</p></div>
-        <div class="cap-card"><div class="cap-icon">📡</div><h4>多渠道采集</h4><p>网页 / 微信 / 短信</p></div>
-        <div class="cap-card"><div class="cap-icon">📊</div><h4>数据汇总分析</h4><p>实时统计 · AI 报告</p></div>
-        <div class="cap-card"><div class="cap-icon">🔒</div><h4>数据安全规范</h4><p>权限控制 · 加密传输</p></div>
+      <!-- 公司基础介绍（合并到 hero 底部） -->
+      <div class="company-block">
+        <div class="company-block-head">
+          <span class="company-tag">关于</span>
+          <h2>上海瑛缇信息科技有限公司</h2>
+        </div>
+        <p class="company-block-text">立足计算机软件技术领域，专注互联网数字化调研相关技术服务。依托软件开发与系统集成能力，提供调研表单系统开发、多渠道问卷采集、数据汇总整理等一体化解决方案，以技术赋能各类调研项目。</p>
+        <div class="capability-grid">
+          <div class="cap-card"><div class="cap-icon">📋</div><h4>表单系统开发</h4><p>定制问卷 · 多题型</p></div>
+          <div class="cap-card"><div class="cap-icon">📡</div><h4>多渠道采集</h4><p>网页 / 微信 / 短信</p></div>
+          <div class="cap-card"><div class="cap-icon">📊</div><h4>数据汇总分析</h4><p>实时统计 · AI 报告</p></div>
+          <div class="cap-card"><div class="cap-icon">🔒</div><h4>数据安全规范</h4><p>权限控制 · 加密传输</p></div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 4 维度介绍 -->
-  <section class="dims" id="about">
+  <!-- 4 维度介绍：data-analytics 作背景 -->
+  <section class="dims has-bg" id="about">
     <div class="container">
       <h2 class="section-title">调研的 4 个维度</h2>
       <p class="section-sub">从专业、态度、效率、情感全面评估护理服务</p>
@@ -102,8 +99,8 @@
     </div>
   </section>
 
-  <!-- 最近反馈 -->
-  <section class="recent" id="recent">
+  <!-- 最近反馈：team-service 作背景 -->
+  <section class="recent has-bg" id="recent">
     <div class="container">
       <div class="recent-head">
         <h2 class="section-title">最近收到的反馈</h2>
