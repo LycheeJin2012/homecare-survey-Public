@@ -17,6 +17,7 @@ export async function onRequestGet(context) {
   const start = (url.searchParams.get('start') || '').trim();
   const end   = (url.searchParams.get('end') || '').trim();
   const caregiver = (url.searchParams.get('caregiver') || '').trim();
+  const search = (url.searchParams.get('search') || '').trim();
   let limit = parseInt(url.searchParams.get('limit') || '50', 10);
   if (!Number.isFinite(limit) || limit <= 0) limit = 50;
   if (limit > 500) limit = 500;
@@ -28,6 +29,12 @@ export async function onRequestGet(context) {
   if (/^\d{4}-\d{2}-\d{2}$/.test(start)) { where.push('service_date >= ?'); binds.push(start); }
   if (/^\d{4}-\d{2}-\d{2}$/.test(end))   { where.push('service_date <= ?'); binds.push(end); }
   if (caregiver) { where.push('caregiver_name = ?'); binds.push(caregiver); }
+  if (search) {
+    // 搜索客户名 / 电话 / 护理员（任一命中）
+    where.push('(customer_name LIKE ? OR customer_phone LIKE ? OR caregiver_name LIKE ?)');
+    const like = `%${search}%`;
+    binds.push(like, like, like);
+  }
   const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
 
   try {

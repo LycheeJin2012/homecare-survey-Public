@@ -111,7 +111,12 @@
     $('#filterStart').value = '';
     $('#filterEnd').value = '';
     $('#filterCaregiver').value = '';
+    $('#filterSearch').value = '';
     loadAll();
+  });
+  // 搜索框回车直接搜索
+  $('#filterSearch').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') loadAll();
   });
 
   // ===== 导出 Excel =====
@@ -295,9 +300,11 @@
     const s = $('#filterStart').value;
     const e = $('#filterEnd').value;
     const c = $('#filterCaregiver').value;
+    const q = $('#filterSearch').value;
     if (s) params.set('start', s);
     if (e) params.set('end', e);
     if (c) params.set('caregiver', c);
+    if (q) params.set('search', q);
     const s2 = params.toString();
     return s2 ? `?${s2}` : '';
   }

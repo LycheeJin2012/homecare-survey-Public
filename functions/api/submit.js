@@ -25,6 +25,10 @@ export async function onRequestPost(context) {
   const caregiver_name = cleanString(body.caregiver_name, 50);
   if (!customer_name) return err('请填写姓名');
   if (!customer_phone) return err('请填写联系电话');
+  // 中国电话格式：11 位手机号 (1[3-9]xxxxxxxxx) / 带区号固话 (0xxx-xxxxxxx) / 7-11 位纯数字
+  if (!/^(1[3-9]\d{9}|0\d{2,3}-?\d{7,8}|\d{7,11})$/.test(customer_phone.replace(/\s/g, ''))) {
+    return err('电话格式不正确（11 位手机号 / 带区号固话 / 7-11 位数字）');
+  }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(service_date)) return err('服务日期格式应为 YYYY-MM-DD');
   if (!caregiver_name) return err('请填写护理员姓名');
 
