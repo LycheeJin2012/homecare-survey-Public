@@ -23,6 +23,17 @@
 
     <!-- 步骤 2：问卷主表 -->
     <form id="survey" class="hidden">
+      <!-- 进度条（sticky 在顶部） -->
+      <div class="progress-bar" aria-label="问卷填写进度">
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+        <div class="progress-meta">
+          <span class="progress-count" id="progressCount">0 / 40</span>
+          <span class="progress-pct" id="progressPct">0%</span>
+        </div>
+      </div>
+
       <h1>居家护理服务满意度调研</h1>
       <p class="lead">所有题目均为单选，评分越高代表您越满意。</p>
 

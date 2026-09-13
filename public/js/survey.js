@@ -160,6 +160,20 @@
     questionDiv.querySelectorAll('.opt').forEach((o) => o.classList.remove('selected'));
     opt.classList.add('selected');
     opt.querySelector('input').checked = true;
+    updateProgress();
+  }
+
+  // ===== 进度条 =====
+  function updateProgress() {
+    const total = QUESTIONS.length;
+    const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+    const pct = Math.round((answered / total) * 100);
+    const fill = document.getElementById('progressFill');
+    const count = document.getElementById('progressCount');
+    const pctEl = document.getElementById('progressPct');
+    if (fill) fill.style.width = pct + '%';
+    if (count) count.textContent = answered + ' / ' + total;
+    if (pctEl) pctEl.textContent = pct + '%';
   }
 
   function enterSurvey() {
