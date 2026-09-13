@@ -87,9 +87,9 @@ function initCarousel() {
       const elT = document.getElementById('metaTotal');
       const elA = document.getElementById('metaAvg');
       const elC = document.getElementById('metaCaregivers');
-      if (elT) elT.textContent = d.total ?? '—';
-      if (elA) elA.textContent = (d.overall != null) ? d.overall.toFixed(2) : '—';
-      if (elC) elC.textContent = (d.caregivers != null) ? d.caregivers : '—';
+      if (elT) animateNum(elT, d.total ?? 0, 0);
+      if (elA) animateNum(elA, d.overall != null ? Math.round(d.overall * 100) / 100 : 0, 2);
+      if (elC) animateNum(elC, d.caregivers ?? 0, 0);
     } catch (_) { /* 忽略 */ }
   }
 
@@ -146,6 +146,26 @@ function initCarousel() {
   // ===== 顶部导航 scroll-spy：根据滚动位置高亮当前 section =====
   initScrollSpy();
 })();
+
+/* ===== 数字滚动动画（800ms ease-out）==== */
+function animateNum(el, target, decimals = 0) {
+  if (target == null || !Number.isFinite(target)) {
+    el.textContent = '—';
+    return;
+  }
+  const duration = 800;
+  const start = performance.now();
+  function step(now) {
+    const t = Math.min(1, (now - start) / duration);
+    // ease-out cubic
+    const eased = 1 - Math.pow(1 - t, 3);
+    const v = target * eased;
+    el.textContent = decimals > 0 ? v.toFixed(decimals) : Math.round(v).toLocaleString('zh-CN');
+    if (t < 1) requestAnimationFrame(step);
+    else el.textContent = decimals > 0 ? target.toFixed(decimals) : target.toLocaleString('zh-CN');
+  }
+  requestAnimationFrame(step);
+}
 
 /* ===== scroll-spy ===== */
 function initScrollSpy() {
