@@ -107,6 +107,27 @@ function xlsxResponse(rows, ts) {
     }).join('') + '</Row>');
   }
 
+  // 合计行：每个数字列求平均（XLSX 用 ss:Formula 也行，这里直接算好）
+  if (rows.length > 0) {
+    const totals = {};
+    const numCols = ['id', 'professionalism', 'attitude', 'efficiency', 'emotion', 'total_score'];
+    for (let i = 1; i <= 40; i++) numCols.push(`q${i}`);
+    for (const k of numCols) {
+      const vals = rows.map((r) => Number(r[k])).filter((v) => Number.isFinite(v));
+      if (vals.length > 0) {
+        totals[k] = Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 100) / 100;
+      }
+    }
+    // 合计行：第一列显示"合计 / 平均 N 条"
+    const totalRow = COLUMNS.map(([k]) => {
+      if (k === 'id') return xlsxCell(`平均 (${rows.length} 条)`, 'String', true);
+      if (k === 'customer_name') return xlsxCell('合计', 'String', true);
+      if (totals[k] != null) return xlsxCell(totals[k], 'Number', true);
+      return xlsxCell('', 'String', true);
+    }).join('');
+    xmlRows.push('<Row>' + totalRow + '</Row>');
+  }
+
   const body = `<?xml version="1.0"?>
 <?mso-application progid="Excel.Sheet"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
