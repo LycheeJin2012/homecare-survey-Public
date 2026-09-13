@@ -142,4 +142,39 @@ function initCarousel() {
 
   // ===== 3 张图轮播 =====
   initCarousel();
+
+  // ===== 顶部导航 scroll-spy：根据滚动位置高亮当前 section =====
+  initScrollSpy();
 })();
+
+/* ===== scroll-spy ===== */
+function initScrollSpy() {
+  const navLinks = document.querySelectorAll('.topbar-nav a[href^="#"]');
+  if (navLinks.length === 0) return;
+  const sections = Array.from(navLinks)
+    .map((a) => document.querySelector(a.getAttribute('href')))
+    .filter(Boolean);
+  if (sections.length === 0) return;
+
+  function setActive(activeIdx) {
+    navLinks.forEach((a, i) => {
+      // 不高亮"填写问卷"和"管理"按钮（它们是外链）
+      if (a.classList.contains('btn-primary') || a.classList.contains('topbar-admin')) return;
+      a.classList.toggle('is-active', i === activeIdx);
+    });
+  }
+
+  // 用 IntersectionObserver：section 进入视口中部时高亮
+  const observer = new IntersectionObserver((entries) => {
+    // 找到当前可见的、距离顶部最近的 section
+    let best = -1, bestTop = Infinity;
+    entries.forEach((e) => {
+      if (e.isIntersecting && e.boundingClientRect.top < bestTop) {
+        bestTop = e.boundingClientRect.top;
+        best = sections.indexOf(e.target);
+      }
+    });
+    if (best >= 0) setActive(best);
+  }, { rootMargin: '-40% 0px -55% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] });
+  sections.forEach((s) => observer.observe(s));
+}

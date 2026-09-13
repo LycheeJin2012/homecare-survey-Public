@@ -26,6 +26,17 @@ a { color: inherit; text-decoration: none; }
 .brand-mark { font-size: 22px; }
 .topbar-nav { display: flex; align-items: center; gap: 18px; font-size: 14px; color: #4b5563; }
 .topbar-nav a:hover { color: #2563eb; }
+.topbar-nav a.is-active { color: #2563eb; font-weight: 600; position: relative; }
+.topbar-nav a.is-active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  width: 18px; height: 2px;
+  background: #2563eb;
+  border-radius: 1px;
+}
 .topbar-admin { color: #9ca3af !important; font-size: 13px; }
 
 .btn-primary {
