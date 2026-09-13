@@ -90,6 +90,15 @@ function initCarousel() {
       if (elT) animateNum(elT, d.total ?? 0, 0);
       if (elA) animateNum(elA, d.overall != null ? Math.round(d.overall * 100) / 100 : 0, 2);
       if (elC) animateNum(elC, d.caregivers ?? 0, 0);
+
+      // 同步填充案例卡片 stats
+      const cs = document.getElementById('caseStats');
+      if (cs) {
+        const csNums = cs.querySelectorAll('.case-stat-num');
+        if (csNums[0]) animateNum(csNums[0], d.total ?? 0, 0);
+        if (csNums[1]) animateNum(csNums[1], d.overall != null ? Math.round(d.overall * 100) / 100 : 0, 2);
+        if (csNums[2]) animateNum(csNums[2], d.caregivers ?? 0, 0);
+      }
     } catch (_) { /* 忽略 */ }
   }
 
