@@ -122,7 +122,6 @@ function initCarousel() {
               <p class="recent-name">${esc(maskName(it.customer_name))}</p>
               <p class="recent-meta">
                 <span>📞 ${esc(maskPhone(it.customer_phone))}</span>
-                <span>👩‍⚕️ ${esc(it.caregiver_name)}</span>
                 <span>🗓 服务 ${esc(it.service_date || '')}</span>
               </p>
             </div>
