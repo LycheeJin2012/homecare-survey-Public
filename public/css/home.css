@@ -37,6 +37,12 @@ a { color: inherit; text-decoration: none; }
   background: #2563eb;
   border-radius: 1px;
 }
+@media (max-width: 900px) {
+  .topbar-nav a:not(.btn-primary):not(.topbar-admin) { display: none; }
+  .topbar-nav { gap: 10px; }
+  .topbar-inner { height: 56px; }
+  .brand-name { font-size: 15px; white-space: nowrap; }
+}
 .topbar-admin { color: #9ca3af !important; font-size: 13px; }
 
 .btn-primary {
