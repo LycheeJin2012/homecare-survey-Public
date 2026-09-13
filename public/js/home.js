@@ -123,7 +123,7 @@ function initCarousel() {
               <p class="recent-meta">
                 <span>📞 ${esc(maskPhone(it.customer_phone))}</span>
                 <span>👩‍⚕️ ${esc(it.caregiver_name)}</span>
-                <span>🕐 ${esc(fmtDate(it.created_at))}</span>
+                <span>🗓 服务 ${esc(it.service_date || '')}</span>
               </p>
             </div>
             <div class="recent-score">

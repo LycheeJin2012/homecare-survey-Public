@@ -50,7 +50,7 @@ export async function onRequestGet(context) {
     const { results } = await DB.prepare(`
       SELECT
         customer_name, customer_phone, caregiver_name,
-        total_score, created_at
+        total_score, service_date, created_at
       FROM submissions
       ORDER BY id DESC
       LIMIT ?
