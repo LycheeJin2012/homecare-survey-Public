@@ -1,4 +1,6 @@
 
+<!-- 触发部署：Functions（functions/）+ 静态资源（public/）需同时发布 -->
+
 
 > Build output 留空以自动识别 `public/`（静态资源）与 `functions/`（Pages Functions API）。
 ## 部署说明
