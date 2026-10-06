@@ -1,3 +1,7 @@
+
+## 部署说明
+
+生产站点：`https://yingti-tech.pages.dev`（Cloudflare Pages 项目 `yingti-tech`，绑定仓库 `homecare-survey-Public` 的 `main` 分支）
 # 居家护理服务满意度调研
 
 > 静态前端 + Cloudflare Pages Functions + D1 + GitHub 自动化部署
